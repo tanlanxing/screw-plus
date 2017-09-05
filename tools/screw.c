@@ -59,6 +59,7 @@ void main(int argc, char**argv)
 void scanRoot(char *path)
 {
     struct dirent* dir = NULL;
+    struct stat statbuf;
     DIR *hP;
     FILE *fp;
     int i;
@@ -75,12 +76,13 @@ void scanRoot(char *path)
         memset(curPath,0,sizeof(curPath));
         strcat(curPath,path);
         strcat(curPath,dir->d_name);
-        if(dir->d_type == 4){
+        lstat(curPath, &statbuf);
+        if(S_ISDIR(statbuf.st_mode)){
             if(curPath[l-1] != '/')
                 strcat(curPath,"/");
             scanRoot(curPath);
         }else
-        if(isPHP(dir->d_name) && dir->d_type == 8){
+        if(isPHP(dir->d_name) && S_ISREG(statbuf.st_mode)){
             screw_work(curPath);
         } 
     }
